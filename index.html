@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 引入Bootstrap CSS和图标库 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="styles.css"> <!-- 自定义CSS -->
+  <title>Featured Products</title>
+  <style>
+    /* 确保商品区域标题居中 */
+    .section-title {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    /* 商品卡片悬停效果 */
+    .card {
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    /* 分类菜单样式 */
+    .category-menu {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 300px;
+      height: 100vh;
+      background-color: white;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1050;
+      transition: left 0.3s ease;
+      padding-top: 70px;
+      padding-left: 20px;
+    }
+    
+    .category-menu.active {
+      left: 0;
+    }
+    
+    .category-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+      display: none;
+    }
+    
+    .category-overlay.active {
+      display: block;
+    }
+    
+    .category-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f1f1;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    
+    .category-item:hover, .category-item.active {
+      color: #000;
+      font-weight: 500;
+    }
+    
+    .close-menu {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    /* 商品分类容器样式 */
+    .category-products {
+      display: none;
+    }
+    
+    .category-products.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 分类菜单 -->
+  <div class="category-menu">
+    <button class="close-menu" id="closeMenu">
+      <i class="bi bi-x"></i>
+    </button>
+    <div class="category-item active" data-category="all">All Products</div>
+    <div class="category-item" data-category="man">Man</div>
+    <div class="category-item" data-category="woman">Woman</div>
+    <div class="category-item" data-category="bag">Bag</div>
+    <div class="category-item" data-category="jewelry">Jewelry</div>
+  </div>
+  
+  <!-- 遮罩层 -->
+  <div class="category-overlay" id="categoryOverlay"></div>
+
+  <!-- 导航栏 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <!-- 移动端菜单按钮 -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- 导航菜单 -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <!-- 左侧菜单 -->
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="menuBtn">
+              <i class="bi bi-list me-1"></i> Menu
+            </a>
+          </li>
+        </ul>
+        
+        <!-- 右侧菜单 - 使用ms-auto将其推到右侧 -->
+        <ul class="navbar-nav ms-auto">
+          <!-- 登录按钮 -->
+          <li class="nav-item">
+            <a class="nav-link" href="login.html">
+              <i class="bi bi-person me-1"></i> Login
+            </a>
+          </li>
+          <!-- 购物车按钮 -->
+          <li class="nav-item position-relative">
+            <a class="nav-link" href="mycart.html">
+              <i class="bi bi-cart me-1"></i> Mycart
+              <!-- 购物车数量标记 -->
+              <span class="position-absolute top-0 right-0 bg-danger text-white rounded-circle" style="width: 18px; height: 18px; font-size: 12px; display: flex; align-items: center; justify-content: center;" id="cartCount">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 轮播图 -->
+  <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="./vivi/Vivienne-Westwood-2-scaled.jpg" class="d-block w-100" alt="Carousel Image 1">
+      </div>
+      <div class="carousel-item">
+        <img src="./vivi/VIVENNE1.jpg" class="d-block w-100" alt="Carousel Image 2">
+      </div>
+      <div class="carousel-item">
+        <img src="./vivi/westwood.jpg" class="d-block w-100" alt="Carousel Image 3">
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+  <!-- 商品展示区域 -->
+  <div class="container py-5">
+    <!-- 标题居中 -->
+    <h2 class="section-title" id="categoryTitle">Featured Products</h2>
+    
+    <!-- 所有商品分类 -->
+    <div class="category-products active" id="all">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+        <!-- 所有分类下的商品 -->
+        <!-- Man分类商品 -->
+        <div class="col" data-category="man">
+          <div class="card h-100">
+            <img src="./vivi/man1.jpg" class="card-img-top" alt="Men's Classic Watch">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">MEN'S CLASSIC WATCH</h5>
+              <p class="card-text">€285</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('MEN\'S CLASSIC WATCH', 285, './vivi/man1.jpg', 'man')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Woman分类商品 -->
+        <div class="col" data-category="woman">
+          <div class="card h-100">
+            <img src="./vivi/woman1.jpeg" class="card-img-top" alt="Embroidered Scarf">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Embroidered Scarf</h5>
+              <p class="card-text">€195</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('WOMEN\'Embroidered Scarf', 195, './vivi/woman1.jpeg', 'woman')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Bag分类商品 -->
+        <div class="col" data-category="bag">
+          <div class="card h-100">
+            <img src="./vivi/handbag.jpeg" class="card-img-top" alt="Hazel Medium Handbag">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Hazel Medium Handbag</h5>
+              <p class="card-text">€685</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('HAZEL MEDIUM HANDBAG', 685, './vivi/handbag.jpeg', 'bag')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Jewelry分类商品 -->
+        <div class="col" data-category="jewelry">
+          <div class="card h-100">
+            <img src="./vivi/bracelet.jpg" class="card-img-top" alt="New Diamante Heart Bracelet">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">NEW DIAMANTE HEART BRACELET</h5>
+              <p class="card-text">€185</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('NEW DIAMANTE HEART BRACELET', 185, './vivi/bracelet.jpg', 'jewelry')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Man分类商品 -->
+    <div class="category-products" id="man">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+        <div class="col">
+          <div class="card h-100">
+            <img src="./vivi/man1.jpg" class="card-img-top" alt="Men's Classic Watch">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">MEN'S CLASSIC WATCH</h5>
+              <p class="card-text">€285</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('MEN\'S CLASSIC WATCH', 285, './vivi/man1.jpg', 'man')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100">
+            <img src="./vivi/man2.jpg" class="card-img-top" alt="Men's Leather Belt">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">MEN'S LEATHER BELT</h5>
+              <p class="card-text">€150</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('MEN\'S LEATHER BELT', 150, './vivi/man2.jpg', 'man')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Woman分类商品 -->
+    <div class="category-products" id="woman">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+        <div class="col">
+          <div class="card h-100">
+            <img src="./vivi/woman1.jpeg" class="card-img-top" alt="Embroidered Scarf">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Embroidered Scarf</h5>
+              <p class="card-text">€195</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('WOMEN\'Embroidered Scarf', 195, './vivi/woman1.jpeg', 'woman')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100">
+            <img src="./vivi/woman2.jpg" class="card-img-top" alt="Women's Leather Gloves">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Women's Leather Gloves</h5>
+              <p class="card-text">€120</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('WOMEN\'S LEATHER GLOVES', 120, './vivi/woman2.jpg', 'woman')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bag分类商品 -->
+    <div class="category-products" id="bag">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+        <div class="col">
+          <div class="card h-100">
+            <img src="./vivi/handbag.jpeg" class="card-img-top" alt="Hazel Medium Handbag">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Hazel Medium Handbag</h5>
+              <p class="card-text">€685</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('Hazel Medium Handbag', 685, './vivi/handbag.jpeg', 'bag')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100">
+            <img src="./vivi/bag2.jpg" class="card-img-top" alt="Mini Crossbody Bag">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Mini Crossbody Bag</h5>
+              <p class="card-text">€320</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('Mini Crossbody Bag', 320, './vivi/bag2.jpg', 'bag')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Jewelry分类商品 -->
+    <div class="category-products" id="jewelry">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+        <div class="col">
+          <div class="card h-100">
+            <img src="./vivi/bracelet.jpg" class="card-img-top" alt="New Diamante Heart Bracelet">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">NEW DIAMANTE HEART BRACELET</h5>
+              <p class="card-text">€185</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('NEW DIAMANTE HEART BRACELET', 185, './vivi/bracelet.jpg', 'jewelry')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100">
+            <img src="./vivi/jewelry2.jpeg" class="card-img-top" alt="New Diamante Heart Earrings">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">NEW DIAMANTE HEART EARRINGS</h5>
+              <p class="card-text">€200</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('NEW DIAMANTE HEART EARRINGS', 200, './vivi/jewelry2.jpeg', 'jewelry')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100">
+            <img src="./vivi/jewelry3.jpg" class="card-img-top" alt="Armour Ring">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">HEART CARD HOLDER</h5>
+              <p class="card-text">€180</p>
+              <button class="btn btn-primary mt-auto" onclick="addToCart('Armour Ring', 180, './vivi/jewelry3.jpg', 'jewelry')">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // 菜单功能实现
+    const menuBtn = document.getElementById('menuBtn');
+    const closeMenuBtn = document.getElementById('closeMenu');
+    const categoryMenu = document.querySelector('.category-menu');
+    const categoryOverlay = document.getElementById('categoryOverlay');
+    const categoryItems = document.querySelectorAll('.category-item');
+    const categoryProducts = document.querySelectorAll('.category-products');
+    const categoryTitle = document.getElementById('categoryTitle');
+    
+    // 打开菜单
+    menuBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      categoryMenu.classList.add('active');
+      categoryOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden'; // 防止背景滚动
+    });
+    
+    // 关闭菜单
+    function closeMenu() {
+      categoryMenu.classList.remove('active');
+      categoryOverlay.classList.remove('active');
+      document.body.style.overflow = ''; // 恢复滚动
+    }
+    
+    closeMenuBtn.addEventListener('click', closeMenu);
+    categoryOverlay.addEventListener('click', closeMenu);
+    
+    // 切换分类
+    categoryItems.forEach(item => {
+      item.addEventListener('click', () => {
+        // 更新活跃状态
+        categoryItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        
+        // 获取分类名称并切换显示
+        const category = item.dataset.category;
+        categoryProducts.forEach(products => {
+          products.classList.remove('active');
+        });
+        document.getElementById(category).classList.add('active');
+        
+        // 更新页面标题
+        categoryTitle.textContent = 
+          category === 'all' ? 'Featured Products' : 
+          category.charAt(0).toUpperCase() + category.slice(1) + ' Collection';
+        
+        // 关闭菜单
+        closeMenu();
+      });
+    });
+    
+    // 检查登录状态
+    if (localStorage.getItem('isLogin') === 'true') {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      // 替换登录按钮为用户信息和退出按钮
+      const loginItem = document.querySelector('a[href="login.html"]').parentNode;
+      loginItem.innerHTML = `
+        <div class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-person me-1"></i> ${currentUser.username}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+          </ul>
+        </div>
+      `;
+    }
+
+    // 退出登录功能
+    function logout() {
+      localStorage.removeItem('isLogin');
+      localStorage.removeItem('currentUser');
+      window.location.reload();
+    }
+    
+    // 购物车功能
+    function addToCart(name, price, image, category) {
+      // 从localStorage获取购物车数据或初始化
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      
+      // 检查商品是否已在购物车中
+      const existingItemIndex = cart.findIndex(item => item.name === name);
+      
+      if (existingItemIndex > -1) {
+        // 如果已存在，增加数量
+        cart[existingItemIndex].quantity += 1;
+      } else {
+        // 如果不存在，添加新商品
+        cart.push({
+          name: name,
+          price: price,
+          image: image,
+          category: category,
+          quantity: 1
+        });
+      }
+      
+      // 保存到localStorage
+      localStorage.setItem('cart', JSON.stringify(cart));
+      
+      // 更新购物车数量标记
+      updateCartCount();
+      
+      // 显示添加成功提示
+      showAddToCartAlert(name);
+    }
+    
+    // 更新购物车数量
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+      document.getElementById('cartCount').textContent = totalItems;
+    }
+    
+    // 显示添加到购物车的提示
+    function showAddToCartAlert(productName) {
+      // 创建提示元素
+      const alert = document.createElement('div');
+      alert.className = 'alert alert-success fixed bottom-3 right-3 z-50';
+      alert.innerHTML = `<i class="bi bi-check-circle me-2"></i> "${productName}" added to cart`;
+      
+      // 添加到页面
+      document.body.appendChild(alert);
+      
+      // 3秒后移除提示
+      setTimeout(() => {
+        alert.classList.add('fade');
+        setTimeout(() => alert.remove(), 500);
+      }, 3000);
+    }
+    
+    // 页面加载时更新购物车数量
+    window.addEventListener('load', updateCartCount);
+  </script>
+</body>
+
+</html>

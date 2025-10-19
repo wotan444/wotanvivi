@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <title>Register</title>
+  <style>
+    .register-container {
+      max-width: 500px;
+      margin: 4rem auto;
+      padding: 2rem;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    .register-title {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .message {
+      text-align: center;
+      margin-top: 1rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+    .success {
+      color: #198754;
+      background-color: #d1e7dd;
+    }
+    .error {
+      color: #dc3545;
+      background-color: #f8d7da;
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏（与其他页面一致） -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">
+              <i class="bi bi-list me-1"></i> Menu
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="bi bi-search me-1"></i> Search
+            </a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="login.html">
+              <i class="bi bi-person me-1"></i> Login
+            </a>
+          </li>
+          <li class="nav-item position-relative">
+            <a class="nav-link" href="mycart.html">
+              <i class="bi bi-cart me-1"></i> Mycart
+              <span class="position-absolute top-0 right-0 bg-danger text-white rounded-circle" style="width: 18px; height: 18px; font-size: 12px; display: flex; align-items: center; justify-content: center;">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 注册表单 -->
+  <div class="container">
+    <div class="register-container">
+      <h2 class="register-title">Sign Up</h2>
+      <form id="registerForm">
+        <!-- 用户名输入 -->
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person"></i></span>
+            <input type="text" class="form-control" id="username" placeholder="Username" required>
+          </div>
+        </div>
+        
+        <!-- 邮箱输入 -->
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+            <input type="email" class="form-control" id="email" placeholder="Email" required>
+          </div>
+        </div>
+        
+        <!-- 密码输入 -->
+        <div class="mb-4">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            <input type="password" class="form-control" id="password" placeholder="Password" required>
+          </div>
+        </div>
+        
+        <!-- 注册按钮 -->
+        <button type="submit" class="btn btn-dark w-100 py-2">Sign Up</button>
+        
+        <!-- 提示消息 -->
+        <div class="message" id="msg"></div>
+        
+        <!-- 登录链接 -->
+        <div class="text-center mt-4">
+          <p>Already have an account? <a href="login.html">Sign in</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // 注册表单提交逻辑
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('msg');
+      
+      // 简单验证
+      if (!username || !email || !password) {
+        msg.className = 'message error';
+        msg.textContent = '请填写所有字段';
+        return;
+      }
+      
+      // 从本地存储获取已注册用户（如果没有则创建空数组）
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      // 检查邮箱是否已注册
+      if (users.some(user => user.email === email)) {
+        msg.className = 'message error';
+        msg.textContent = '该邮箱已被注册';
+        return;
+      }
+      
+      // 存储新用户到本地
+      users.push({ username, email, password });
+      localStorage.setItem('users', JSON.stringify(users));
+      
+      // 提示注册成功并跳转登录页
+      msg.className = 'message success';
+      msg.textContent = '注册成功！正在跳转到登录页...';
+      
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
